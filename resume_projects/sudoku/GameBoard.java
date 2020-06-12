@@ -4,10 +4,12 @@ import java.util.Random;
 
 public class GameBoard extends AbsGameBoard implements IGameBoard{
 
-    private int[][] board;
+    private int[][] current_board;
+    private int[][] original_board;
 
     public GameBoard(){
-        board = new int[SIDELENTH][SIDELENTH];
+        current_board = new int[SIDELENTH][SIDELENTH];
+        original_board = new int[SIDELENTH][SIDELENTH];
     }
 
     @Override
@@ -17,18 +19,24 @@ public class GameBoard extends AbsGameBoard implements IGameBoard{
         int[][] initial_game = GameInfo.getGame(seed);
 
         for(int[] cell_data : initial_game){
-            board[cell_data[0]][cell_data[1]] = cell_data[2];
+            current_board[cell_data[0]][cell_data[1]] = cell_data[2];
+            original_board[cell_data[0]][cell_data[1]] = cell_data[2];
         }
 
     }
 
     @Override
     public int getValueAtPos(BoardPosition pos) {
-        return board[pos.getX()][pos.getY()];
+        return current_board[pos.getX()][pos.getY()];
     }
 
     @Override
     public void placeNumber(BoardPosition pos, int val) {
-        board[pos.getX()][pos.getY()] = val;
+        current_board[pos.getX()][pos.getY()] = val;
+    }
+
+    @Override
+    public boolean checkIfFree(BoardPosition pos) {
+        return original_board[pos.getX()][pos.getY()] == IGameBoard.EMPTY;
     }
 }

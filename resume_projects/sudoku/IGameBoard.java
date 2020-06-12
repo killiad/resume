@@ -27,8 +27,8 @@ public interface IGameBoard {
     /**
      * Retrieves the value at position pos
      * @param pos position to retrieve value from
-     * precondition: 0 <= pos.getRow() < SIDELENGTH
-     *               0 <= pos.getColumn() < SIDELENGTH
+     * precondition: 0 <= pos.getX() < SIDELENGTH
+     *               0 <= pos.getY() < SIDELENGTH
      * postcondition: getValueAtPos = char at position pos
      * @return value at position pos
      */
@@ -44,12 +44,44 @@ public interface IGameBoard {
     void placeNumber(BoardPosition pos, int val);
 
     /**
+     * checks if a cell is allowed to be changed. In Sudoku, one cannot change
+     * the cells that were given as part of the original puzzle
+     * @param pos position of cell that will be checked
+     * precondition: 0 <= pos.getX() < SIDELENGTH
+     *               0 <= pos.getY() < SIDELENGTH
+     * postcondition: return true if and only if getValueAtPos(pos) = EMPTY in original board
+     * @return getValueAtPos(pos) = EMPTY in original board
+     */
+    boolean checkIfFree(BoardPosition pos);
+
+    /**
+     * returns the original board, before any new numbers were placed
+     * postcondition: getOriginalBoard = oboard before any changes were made
+     * @return the original board, before any changes were made
+     */
+    default IGameBoard getOriginalBoard(){
+        IGameBoard output = new GameBoard();
+        for(int x = 0; x < SIDELENTH; x++){
+            for(int y = 0; y < SIDELENTH; y++){
+                BoardPosition pos = new BoardPosition(x,y);
+                if(!checkIfFree(pos)){
+                    output.placeNumber(pos, getValueAtPos(pos));
+                }
+            }
+        }
+        return output;
+    }
+
+    /**
      * Creates the solution to the sudoku game, then returns the board
      * postcondition: generationSolution = board of the solution to the current game
      * @return board of the solution to the current game
      */
     default IGameBoard generateSolution(){
-        return new GameBoard();
+
+        IGameBoard solution = getOriginalBoard();
+        return solution;
+
     }
 
     /**
@@ -65,12 +97,12 @@ public interface IGameBoard {
         return getValueAtPos(pos) == val;
     }
 
-    /**
+/*     /**
      * checks to see if sudoku game is solved
      * postcondition: checkIfSolved = true iff this == generateSolution()
      * @return true if and only if the board is solved
      */
-    default boolean checkifSolved(){
-        return this.equals(generateSolution());
-    }
+    //default boolean checkifSolved(){
+    //    return this.equals(generateSolution());
+    //}
 }
